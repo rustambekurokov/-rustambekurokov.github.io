@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; form-action 'self'; base-uri 'none'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Fine-tuning ESM-2 for protein subcellular localization: LoRA matches full fine-tuning with 2.4% of the parameters — Rustambek Urokov</title>
 <meta name="description" content="Rank-16 LoRA on ESM-2 650M reaches the accuracy of a fully fine-tuned 150M model while training 2.4% of the weights — and a frozen 8M linear probe is already most of the way there.">
 <link rel="canonical" href="https://rustambek.org/blog/lora-matches-full-fine-tuning">
