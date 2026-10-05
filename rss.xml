@@ -5,8 +5,16 @@
     <link>https://rustambek.org/blog</link>
     <description>Undergraduate researcher in machine learning and computational biology at New Uzbekistan University. Held-out evaluation for protein and sequence models.</description>
     <language>en</language>
-    <lastBuildDate>Thu, 24 Sep 2026 20:38:00 +0500</lastBuildDate>
+    <lastBuildDate>Thu, 01 Oct 2026 01:36:00 +0500</lastBuildDate>
     <atom:link href="https://rustambek.org/rss.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Deep dive into flow models</title>
+      <link>https://rustambek.org/blog/deep-dive-into-flow-models</link>
+      <guid isPermaLink="true">https://rustambek.org/blog/deep-dive-into-flow-models</guid>
+      <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Rustambek Urokov</dc:creator>
+      <pubDate>Thu, 01 Oct 2026 01:36:00 +0500</pubDate>
+      <description>Flow models reach the data distribution with an ODE rather than an SDE. Velocity fields, marginal versus conditional, and why the two flow matching losses have the same minimiser.</description>
+    </item>
     <item>
       <title>What are diffusion models, and how exactly do they stand out from Autoregressive Models?</title>
       <link>https://rustambek.org/blog/what-are-diffusion-models-and-how-exactly-do-they-stand-out-from-autoregressive</link>

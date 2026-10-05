@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; form-action 'self'; base-uri 'none'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Deep dive into flow models — Rustambek Urokov</title>
+<meta name="description" content="Flow models reach the data distribution with an ODE rather than an SDE. Velocity fields, marginal versus conditional, and why the two flow matching losses have the same minimiser.">
+<link rel="canonical" href="https://rustambek.org/blog/deep-dive-into-flow-models">
+<link rel="alternate" type="application/rss+xml" title="Rustambek Urokov" href="/rss.xml">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Rustambek Urokov">
+<meta property="og:title" content="Deep dive into flow models — Rustambek Urokov">
+<meta property="og:description" content="Flow models reach the data distribution with an ODE rather than an SDE. Velocity fields, marginal versus conditional, and why the two flow matching losses have the same minimiser.">
+<meta property="og:url" content="https://rustambek.org/blog/deep-dive-into-flow-models">
+<meta property="og:locale" content="en_US">
+
+<meta property="og:image" content="https://rustambek.org/uploads/1d72f342-a28c-4447-9841-f3e187ed0b8f.jpg">
+
+<meta property="og:image:alt" content="Rustambek Urokov">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preload" href="/static/fonts/instrumentserif-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/ibmplexsans-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/fonts.css">
+<link rel="stylesheet" href="/static/prose.css">
+<link rel="stylesheet" href="/static/site.css">
+<script src="/static/app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<details class="nav-menu" id="nav-menu">
+  <summary><span class="vh">Menu</span></summary>
+  <div class="nav-panel">
+    <p class="nav-panel-name">Rustambek Urokov</p>
+    <nav aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="/papers">Papers</a>
+      <a href="/projects">Projects</a>
+      <a href="/blog" aria-current="page">Writing</a>
+    </nav>
+  </div>
+</details>
+
+<header class="site-header">
+  <div class="page page-reading">
+    <div class="masthead">
+      <a class="wordmark" href="/">Rustambek Urokov</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/papers">Papers</a>
+        <a href="/projects">Projects</a>
+        <a href="/blog" aria-current="page">Writing</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+  <div class="page page-reading">
+
+<article class="row">
+  <div class="txt">
+    <div class="article-head">
+      <p class="date">1 Oct 2026 &nbsp;·&nbsp; Rustambek Urokov</p>
+      <h1 class="post-title">Deep dive into flow models</h1>
+    </div>
+    <div class="prose"><p>We previously discussed how diffusions work and their differences with AR models. There is a close family of deep learning paradigms closer to diffusions called flow models. Flow models, instead of relying on Stochastic Differential Equations, use Ordinary Differential Equations (we’ll cover them soon) in order to form a path from normally (Gaussian) distributed noise to the target data distribution.</p>
+<h2>Training objective</h2>
+<p>We introduce the term velocity field, which defines how the probability distribution will be moving towards the target distribution. Say, we pick an initial distribution (Gaussian) and approximate the target distribution. Then, we need to teach the model to transform the initial distribution into the target distribution. This is the main training objective that’s used both for diffusion and flow models. The major difference between them is in the techniques used to reach that goal. The illustration of our training objective is given below.</p>
+<p><img src="https://rustambek.org/uploads/44b63199373c4cc2ace8a7abd4d738e6.jpg" alt="On the left a single symmetric Gaussian centred at zero; on the right a complex multi-modal target distribution in red, approximated by a mixture of simpler green components with means mu-1 to mu-7."></p>
+<p><em>Initial Distribution -&gt; Target Distribution</em></p>
+<h2>Ordinary Differential Equations</h2>
+<p>Ordinary differential equations define a condition for a trajectory, or the velocity field — <code>v_θ</code> at point x and time t:</p>
+<pre><code>dxₜ/dt = v_θ(xₜ, t)
+</code></pre>
+<p><code>v_θ</code> is the neural network that we need to train, It takes the current data point and time, and outputs a velocity, pointing where and how fast to move.</p>
+<h2>Flow matching</h2>
+<p>While ODE is the core mechanism, the training objective is performed using the so-called “Flow matching” technique. Before getting to this term, let’s first define two types of vector/velocity fields:</p>
+<ol>
+<li><em>The marginal vector field</em> defines the trajectory of the probability distribution by averaging conditional vector fields, weighted by how likely each data point is given xt. This is challenging because averaging over all data (as shown in the formula below) is expensive, and solving the integral of it yields an intractability.</li>
+</ol>
+<pre><code>uₜ(x) = E[uₜ(x | z) | Xₜ = x], z ~ p_data
+</code></pre>
+<p>2, <em>The conditional vector field</em> acts the same as marginal VF, except it samples only one data point at time t and outputs the next trajectory (vector, or you can call it a neural network), which is tractable.</p>
+<pre><code>dxₜ/dt = uₜ(xₜ | z)
+</code></pre>
+<p>We are going to deal with Conditional VFs most of the time. Flow matching has a loss, since it regresses neural networks. The general loss function illustrates the difference between the <strong>current vector field</strong> at point x and <strong>marginal vector field</strong> at all of x points. As you might have guessed this is intractable. This is the formalized formula for <strong>Loss function of Flow Matching:</strong></p>
+<pre><code>L_FM(θ) = E[||v_θ(xₜ, t) − uₜ(xₜ)||²]
+</code></pre>
+<p>Again, we turn our attention to the simpler, yet effective loss function, called <em>the conditional Flow Matching Loss</em>, which accounts for the difference between the current vector field and conditional vector field, which we defined above. Hence, it is tractable.</p>
+<pre><code>L_CFM(θ) = E[||v_θ(xₜ, t) − uₜ(xₜ | z)||²]
+</code></pre>
+<h2>THEOREM</h2>
+<p>There is an interesting theorem which says the loss function of FM equals the conditional loss function plus some constant.</p>
+<pre><code>L_CFM(θ) = L_FM(θ) + C
+</code></pre>
+<p>Sounds quite random, right? The key idea is that the marginal vector field is the weighted average of the conditional probabilities. And squared error of each conditional vector field adds the spread around the average, but it doesn’t depend on our parameter , hence it’s constant.</p>
+<pre><code>C = E[||uₜ(Xₜ | Z) − uₜ(Xₜ)||²] ≥ 0
+</code></pre>
+<p><img src="https://rustambek.org/uploads/5b8f7aadd5c64a809bfc79c93b03d006.png" alt="Two parabolas plotted against the model parameter theta: the flow matching loss and the conditional flow matching loss. Both reach their minimum at the same theta, separated by the constant C."></p>
+<p><em>As you see, the minimum of both functions is the same; they differ only in their intercept.</em></p>
+<p>So, flow matching is one of those innovative techniques that carries simplicity in its form, yet it is elegant.</p>
+</div>
+  </div>
+</article>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="page page-reading">
+    <p>Rustambek Urokov</p>
+  </div>
+</footer>
+</body>
+</html>
