@@ -1,0 +1,311 @@
+/* rustambek.org — one bold move (the name), quiet everywhere else.
+   Palette and type are the same system as the printed CV: warm paper, cardinal
+   accent, Instrument Serif for the name, IBM Plex Sans to read, IBM Plex Mono
+   for labels, dates and links. */
+
+:root {
+  --bg: #f7f4ed;
+  --ink: #16140f;
+  --muted: #5c564a;
+  --rule: #ddd7c9;
+  --accent: #9b2c2c;
+  --paper-link: #16140f;
+  --meta-link: #9b2c2c;
+  --code-bg: #efe9dc;
+
+  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-text: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-math: "Libertinus Math", "STIX Two Math", "Cambria Math", serif;
+
+  --rail: 12rem;      /* the left column: portrait, links, dates */
+  --gap: 2.2rem;
+  --measure: 33rem;   /* ~58 characters: the CV's column, not a blog's */
+  --page-x: 1.75rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html { background: var(--bg); }
+body {
+  margin: 0; min-height: 100dvh;
+  display: flex; flex-direction: column;
+  padding: 0 var(--page-x);
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-text); font-size: .9375rem; line-height: 1.6;
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+main { flex: 1 0 auto; padding-top: 3.5rem; }
+
+.vh {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip-path: inset(50%);
+  white-space: nowrap;
+}
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  font-family: var(--font-mono); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase;
+}
+.skip-link:focus {
+  left: .5rem; top: .5rem;
+  background: var(--bg); color: var(--ink);
+  padding: .6rem 1rem; text-decoration: none;
+  outline: 2px solid var(--accent); outline-offset: 3px;
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 1px; }
+@media (forced-colors: active) { :focus-visible { outline-color: Highlight; } }
+main:focus { outline: none; }
+
+a { color: var(--ink); text-decoration: none; background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 100% 1px; background-repeat: no-repeat; background-position: 0 100%; }
+a:hover { background-size: 100% 2px; }
+
+.page { width: 100%; max-width: calc(var(--rail) + var(--gap) + var(--measure)); margin-inline: auto; }
+/* The home page is a two-column composition around a large portrait, so it needs more room
+   than a reading column. Header and footer take the same width there. */
+.page-home { max-width: 72rem; }
+
+/* An article has nothing to put in the rail — a date and a name sit above the title — so the
+   rail would only push the prose to the right of a page that is otherwise empty. On a post
+   the whole page is the reading column instead: wordmark, text and footer share one measure,
+   centred. */
+.page-reading { max-width: var(--measure); }
+.page-reading .row { grid-template-columns: minmax(0, 1fr); column-gap: 0; }
+.page-reading .txt { grid-column: 1; }
+.row { display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); column-gap: var(--gap); }
+.rail { grid-column: 1; margin: 0; }
+.txt { grid-column: 2; min-width: 0; }
+
+/* ---------------------------------------------------------------- masthead */
+
+.site-header { padding-top: 2.25rem; }
+.masthead {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline;
+  gap: .5rem 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--rule);
+}
+.wordmark {
+  font-family: var(--font-mono); font-size: .8rem; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink); background-image: none;
+}
+.site-nav {
+  display: flex; gap: 1.5rem; margin-left: auto;
+  font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+}
+.site-nav a { color: var(--muted); background-image: none; padding: .25rem 0; }
+.site-nav a:hover { color: var(--ink); }
+.site-nav a[aria-current="page"] { color: var(--accent); }
+
+.nav-menu { display: none; }
+.nav-menu > summary {
+  list-style: none;
+  position: fixed; top: 1.1rem; right: 1rem; z-index: 60;
+  display: grid; place-items: center;
+  width: 44px; height: 44px; cursor: pointer;
+}
+.nav-menu > summary::-webkit-details-marker { display: none; }
+.nav-menu > summary::before, .nav-menu[open] > summary::after {
+  content: ""; grid-area: 1 / 1; place-self: center;
+  width: 22px; height: 2px; background: var(--ink);
+}
+.nav-menu > summary::before { box-shadow: 0 -7px 0 var(--ink), 0 7px 0 var(--ink); }
+.nav-menu[open] > summary::before { box-shadow: none; rotate: 45deg; }
+.nav-menu[open] > summary::after { rotate: -45deg; }
+@media (prefers-reduced-motion: no-preference) {
+  .nav-menu > summary::before, .nav-menu > summary::after { transition: rotate .15s ease, box-shadow .15s ease; }
+}
+.nav-panel {
+  position: fixed; inset: 0; z-index: 50; background: var(--bg);
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  gap: 1.75rem; padding: var(--page-x);
+}
+.nav-panel-name { font-family: var(--font-mono); font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.nav-panel nav { display: flex; flex-direction: column; gap: 1rem; }
+.nav-panel a { font-family: var(--font-display); font-size: 2.4rem; line-height: 1.1; background-image: none; }
+.nav-panel a[aria-current="page"] { color: var(--accent); }
+
+/* ---------------------------------------------------------------- the name */
+
+/* Home: the portrait carries the left half, floor to ceiling. */
+.home-split {
+  display: grid; grid-template-columns: minmax(0, 31.25rem) minmax(0, 1fr);
+  column-gap: 4.5rem; align-items: start;
+}
+.home-text { min-width: 0; padding-top: .35rem; }
+.hero { padding-bottom: 1rem; }
+.kicker {
+  margin: 0 0 1.4rem;
+  font-family: var(--font-mono); font-size: .72rem; font-weight: 500;
+  letter-spacing: .18em; text-transform: uppercase; color: var(--accent);
+}
+.name {
+  margin: 0; font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(2.9rem, 6.6vw, 5.5rem); line-height: .86; letter-spacing: -0.022em;
+}
+.name > span { display: block; }
+.name-2 { display: flex !important; align-items: center; gap: clamp(.75rem, 2vw, 1.5rem); }
+.mark {
+  display: block; flex-shrink: 0;
+  width: clamp(3.5rem, 7.5vw, 6.5rem); height: clamp(1.1rem, 1.95vw, 1.65rem);
+  background: var(--accent);
+}
+
+/* The one line that makes the CV read as designed: a sentence, set large and italic,
+   between the name and the prose. */
+.statement {
+  margin: 1.75rem 0 0; max-width: 33rem;
+  font-family: var(--font-display); font-style: italic; font-weight: 400;
+  font-size: clamp(1.35rem, 2.3vw, 1.875rem); line-height: 1.24; text-wrap: pretty;
+}
+.hero-rule { margin: 1.85rem 0 1.6rem; height: 1px; background: var(--rule); border: 0; }
+.hero-body {
+  display: grid; grid-template-columns: var(--rail) minmax(0, 1fr);
+  column-gap: var(--gap);
+  margin-top: 1.75rem;
+}
+.hero-rail { grid-column: 1; }
+.portrait {
+  grid-column: 1; display: block;
+  width: 100%; height: clamp(26rem, 47vw, 43.75rem);
+  object-fit: cover; object-position: center 20%;
+  border-radius: 2px;
+}
+.hero-text { grid-column: 2; min-width: 0; }
+.hero-text .bio p:first-child { margin-top: 0; }
+.elsewhere {
+  list-style: none; margin: 1.9rem 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: .5rem 1.9rem;
+  font-family: var(--font-mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase;
+}
+.elsewhere li { margin: 0; }
+.rail-label {
+  margin: 1.4rem 0 .6rem; font-family: var(--font-mono); font-size: .65rem; font-weight: 500;
+  letter-spacing: .18em; text-transform: uppercase; color: var(--accent);
+}
+.elsewhere a { color: var(--muted); background-image: none; }
+.elsewhere a:hover { color: var(--accent); }
+
+/* ---------------------------------------------------------------- sections */
+
+.band { margin-top: 3.25rem; }
+.label {
+  display: flex; align-items: center; gap: 1rem; margin: 0 0 1.1rem;
+  font-family: var(--font-mono); font-size: .72rem; font-weight: 500;
+  letter-spacing: .18em; text-transform: uppercase; color: var(--accent);
+}
+.label::after { content: ""; flex-grow: 1; height: 1px; background: var(--rule); }
+.page-title {
+  margin: 0 0 2.5rem; font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(2.6rem, 8vw, 4.5rem); line-height: .95; letter-spacing: -0.015em;
+}
+.empty { color: var(--muted); }
+.more { margin: 1.75rem 0 0; font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; }
+.more a { color: var(--muted); background-image: none; }
+.more a::after { content: "\00A0\2192"; color: var(--accent); }
+.more a:hover { color: var(--ink); }
+
+.entries { list-style: none; margin: 0; padding: 0; }
+.entry {
+  display: grid; grid-template-columns: 2.75rem minmax(0, 1fr); column-gap: 1rem;
+  padding: 1.15rem 0; border-top: 1px solid var(--rule);
+}
+.entry:first-child { border-top: 0; padding-top: 0; }
+.num { font-family: var(--font-mono); font-size: .72rem; color: var(--accent); padding-top: .32rem; }
+.entry-title { margin: 0; font-size: 1rem; font-weight: 500; line-height: 1.4; text-wrap: pretty; }
+.entry-title a { background-size: 100% 1px; }
+.authors { margin: .35rem 0 0; font-size: .9rem; color: var(--muted); }
+.authors strong { font-weight: 500; color: var(--ink); }
+.summary { margin: .5rem 0 0; font-size: .92rem; color: var(--muted); text-wrap: pretty; }
+.meta { margin: .35rem 0 0; font-family: var(--font-mono); font-size: .7rem; letter-spacing: .06em; color: var(--muted); }
+.date { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .06em; color: var(--muted); }
+.refs { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin: .7rem 0 0; }
+.chip {
+  font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--meta-link); background-image: none; padding: .3rem 0;
+}
+.chip::before { content: "["; }
+.chip::after { content: "]"; }
+.chip:hover { color: var(--ink); }
+.ext::after { content: "\00A0\2197"; font-size: .8em; color: var(--accent); }
+
+.year-band { margin-top: 3rem; }
+.year-band:first-of-type { margin-top: 0; }
+.year {
+  margin: 0 0 1.25rem; font-family: var(--font-display); font-weight: 400;
+  font-size: 2rem; line-height: 1; color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- article */
+
+.article-head { margin-bottom: 2.5rem; }
+.post-title {
+  margin: .75rem 0 0; font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(2rem, 6vw, 3.25rem); line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance;
+}
+.byline { margin: .9rem 0 0; font-family: var(--font-mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.post-list { list-style: none; margin: 0; padding: 0; }
+.post-list > li { padding: 1.75rem 0; border-top: 1px solid var(--rule); }
+.post-list > li:first-child { border-top: 0; padding-top: 0; }
+.excerpt { margin: .5rem 0 0; color: var(--muted); font-size: .95rem; text-wrap: pretty; }
+
+/* ---------------------------------------------------------------- footer */
+
+.site-footer { margin-top: 6rem; }
+.site-footer .page {
+  border-top: 1px solid var(--rule); padding: 1.25rem 0 3rem;
+  font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--muted);
+}
+.site-footer p { margin: 0; }
+
+/* ------------------------------------------------- motion, added by script */
+
+/* `pending` is only ever set by the script, on an element it is already observing, so
+   nothing can be left invisible if the script does not run. */
+.reveal.pending { opacity: 0; transform: translateY(12px); }
+.reveal.seen { opacity: 1; transform: none; transition: opacity .7s ease, transform .7s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal.pending { opacity: 1; transform: none; }
+  .reveal.seen { transition: none; }
+}
+
+/* ---------------------------------------------------------------- responsive */
+
+@media (max-width: 1100px) {
+  .home-split { grid-template-columns: minmax(0, 22rem) minmax(0, 1fr); column-gap: 3rem; }
+}
+@media (max-width: 900px) { :root { --rail: 8rem; --gap: 1.75rem; } }
+
+@media (max-width: 767px) {
+  :root { --rail: 0rem; --measure: 100%; --page-x: 1.25rem; }
+  .site-nav { display: none; }
+  .nav-menu { display: block; }
+  .nav-menu[open] ~ .site-header,
+  .nav-menu[open] ~ main,
+  .nav-menu[open] ~ .site-footer { display: none; }
+
+  .row, .hero-body, .home-split { grid-template-columns: minmax(0, 1fr); column-gap: 0; }
+  .rail, .txt, .portrait, .hero-text, .hero-rail, .home-text { grid-column: 1; }
+  .portrait { width: 100%; max-width: 22rem; height: auto; aspect-ratio: 4 / 5; margin-bottom: 2rem; }
+  .home-text { padding-top: 0; }
+  .elsewhere { gap: .5rem 1.5rem; }
+  .site-header { padding-top: 1.25rem; }
+  .masthead { padding-right: 3rem; min-height: 2.75rem; }
+  main { padding-top: 2.75rem; }
+  .hero-body { margin-top: 2.25rem; }
+  .band { margin-top: 3.25rem; }
+  .entry { grid-template-columns: 2rem minmax(0, 1fr); }
+}
+
+@media print {
+  body { background: #fff; color: #000; font-size: 11pt; padding: 0; }
+  .site-nav, .nav-menu, .skip-link, .more, .elsewhere { display: none; }
+  .page { max-width: none; }
+  a { color: #000; background-image: none; }
+  .mark { background: #000; }
+  .site-footer { margin-top: 2rem; }
+}

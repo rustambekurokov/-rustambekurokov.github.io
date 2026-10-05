@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fine-tuning ESM-2 for protein subcellular localization: LoRA matches full fine-tuning with 2.4% of the parameters — Rustambek Urokov</title>
+<meta name="description" content="Rank-16 LoRA on ESM-2 650M reaches the accuracy of a fully fine-tuned 150M model while training 2.4% of the weights — and a frozen 8M linear probe is already most of the way there.">
+<link rel="canonical" href="https://rustambek.org/blog/lora-matches-full-fine-tuning">
+<link rel="alternate" type="application/rss+xml" title="Rustambek Urokov" href="/rss.xml">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Rustambek Urokov">
+<meta property="og:title" content="Fine-tuning ESM-2 for protein subcellular localization: LoRA matches full fine-tuning with 2.4% of the parameters — Rustambek Urokov">
+<meta property="og:description" content="Rank-16 LoRA on ESM-2 650M reaches the accuracy of a fully fine-tuned 150M model while training 2.4% of the weights — and a frozen 8M linear probe is already most of the way there.">
+<meta property="og:url" content="https://rustambek.org/blog/lora-matches-full-fine-tuning">
+<meta property="og:locale" content="en_US">
+
+<meta property="og:image" content="https://rustambek.org/uploads/1d72f342-a28c-4447-9841-f3e187ed0b8f.jpg">
+
+<meta property="og:image:alt" content="Rustambek Urokov">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preload" href="/static/fonts/instrumentserif-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/ibmplexsans-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/fonts.css">
+<link rel="stylesheet" href="/static/prose.css">
+<link rel="stylesheet" href="/static/site.css">
+<script src="/static/app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<details class="nav-menu" id="nav-menu">
+  <summary><span class="vh">Menu</span></summary>
+  <div class="nav-panel">
+    <p class="nav-panel-name">Rustambek Urokov</p>
+    <nav aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="/papers">Papers</a>
+      <a href="/projects">Projects</a>
+      <a href="/blog" aria-current="page">Writing</a>
+    </nav>
+  </div>
+</details>
+
+<header class="site-header">
+  <div class="page page-reading">
+    <div class="masthead">
+      <a class="wordmark" href="/">Rustambek Urokov</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/papers">Papers</a>
+        <a href="/projects">Projects</a>
+        <a href="/blog" aria-current="page">Writing</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+  <div class="page page-reading">
+
+<article class="row">
+  <div class="txt">
+    <div class="article-head">
+      <p class="date">8 Jul 2026 &nbsp;·&nbsp; Rustambek Urokov</p>
+      <h1 class="post-title">Fine-tuning ESM-2 for protein subcellular localization: LoRA matches full fine-tuning with 2.4% of the parameters</h1>
+    </div>
+    <div class="prose"><p><em>The full article is on <a href="https://medium.com/@urokovrustambek/fine-tuning-esm-2-for-protein-subcellular-localization-lora-matches-full-fine-tuning-with-2-4-ef3f5a4b6a18" rel="noopener noreferrer">Medium</a>. This is the short version.</em></p>
+<p>Where a protein localises in the cell is fundamental to understanding what it does, and
+determining it experimentally is slow and expensive. I fine-tuned ESM-2 for 10-class subcellular
+localization on the DeepLoc 2.0 data to see how much of that can be read off the sequence alone,
+and how cheaply.</p>
+<p>The head is the same throughout — ESM-2 backbone, mean pooling, LayerNorm, linear, GELU, linear,
+10 classes — so that four training strategies could be compared under one harness: a linear probe
+on a frozen 8M model, full fine-tuning of the 35M and 150M models, and rank-16 LoRA on the query,
+key and value projections of the 650M model.</p>
+<h2>Results</h2>
+<p>Rank-16 LoRA on the 650M model reached <strong>76.5% accuracy (MCC 0.704)</strong> while training 2.4% of the
+parameters. Full fine-tuning of the 150M model reached <strong>76.6% (MCC 0.706)</strong>. Four times the
+backbone bought nothing at this data size.</p>
+<p>Two things beside the headline are worth keeping:</p>
+<ol>
+<li>The linear probe on the frozen 8M model already gives 69.6%. The pretrained representation
+encodes localization-relevant features before any adaptation at all.</li>
+<li>At roughly 17,000 training examples, the ceiling looks like the dataset rather than the model.
+More data or multi-task training is the lever here, not more parameters.</li>
+</ol>
+<h2>One practical detail</h2>
+<p>ESM-2 names its attention modules <code>query</code>, <code>key</code> and <code>value</code>, not <code>q_proj</code>, <code>k_proj</code> and
+<code>v_proj</code> the way LLaMA-style models do. LoRA target modules have to be configured accordingly.
+That cost me an afternoon.</p>
+<p>Training ran on an NVIDIA DGX Spark. The four checkpoints are on the
+<a href="https://huggingface.co/rustambekurokov" rel="noopener noreferrer">Hugging Face Hub</a>, the code is
+<a href="https://github.com/rustambekurokov/esm2-reimplementation" rel="noopener noreferrer">on GitHub</a>, and there is a
+<a href="https://huggingface.co/spaces/rustambekurokov/esm2-protein-localization" rel="noopener noreferrer">Gradio demo</a> you can
+paste a sequence into.</p>
+</div>
+  </div>
+</article>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="page page-reading">
+    <p>Rustambek Urokov</p>
+  </div>
+</footer>
+</body>
+</html>

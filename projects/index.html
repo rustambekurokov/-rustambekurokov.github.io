@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects — Rustambek Urokov</title>
+<meta name="description" content="Undergraduate researcher in machine learning and computational biology at New Uzbekistan University. Held-out evaluation for protein and sequence models.">
+<link rel="canonical" href="https://rustambek.org/projects">
+<link rel="alternate" type="application/rss+xml" title="Rustambek Urokov" href="/rss.xml">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Rustambek Urokov">
+<meta property="og:title" content="Projects — Rustambek Urokov">
+<meta property="og:description" content="Undergraduate researcher in machine learning and computational biology at New Uzbekistan University. Held-out evaluation for protein and sequence models.">
+<meta property="og:url" content="https://rustambek.org/projects">
+<meta property="og:locale" content="en_US">
+
+<meta property="og:image" content="https://rustambek.org/uploads/1d72f342-a28c-4447-9841-f3e187ed0b8f.jpg">
+
+<meta property="og:image:alt" content="Rustambek Urokov">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preload" href="/static/fonts/instrumentserif-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/ibmplexsans-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/fonts.css">
+<link rel="stylesheet" href="/static/prose.css">
+<link rel="stylesheet" href="/static/site.css">
+<script src="/static/app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<details class="nav-menu" id="nav-menu">
+  <summary><span class="vh">Menu</span></summary>
+  <div class="nav-panel">
+    <p class="nav-panel-name">Rustambek Urokov</p>
+    <nav aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="/papers">Papers</a>
+      <a href="/projects" aria-current="page">Projects</a>
+      <a href="/blog">Writing</a>
+    </nav>
+  </div>
+</details>
+
+<header class="site-header">
+  <div class="page">
+    <div class="masthead">
+      <a class="wordmark" href="/">Rustambek Urokov</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/papers">Papers</a>
+        <a href="/projects" aria-current="page">Projects</a>
+        <a href="/blog">Writing</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+  <div class="page">
+
+<h1 class="page-title">Projects</h1>
+
+
+<section class="year-band reveal" aria-labelledby="pyear-2026">
+  <h2 class="year" id="pyear-2026">2026</h2>
+  <ol class="entries">
+    
+    <li class="entry">
+      <span class="num">01</span>
+      <div>
+        <h3 class="entry-title">Uzbek text-to-speech for Openbank</h3>
+        <p class="summary">Built the corpus, trained the model and shipped the Uzbek text-to-speech system now serving Openbank&#39;s mobile assistant on self-hosted infrastructure. A full fine-tune of OmniVoice on 220.75 hours and 148,529 clips, with leakage-free splits and an Uzbek text-normalisation front end.</p>
+        
+      </div>
+    </li>
+    
+    <li class="entry">
+      <span class="num">02</span>
+      <div>
+        <h3 class="entry-title">ESM2 to ESM3 representation distillation</h3>
+        <p class="summary">An adapter that maps frozen ESM-2 residue representations into ESM3&#39;s space, with ESM3 run once offline to cache teacher embeddings for 5,000 UniProt proteins and 1,534,505 residues. On a held-out 500-protein split it reaches R² 0.807 and CKA 0.767 against a raw ESM-2 baseline of 0.691. The success gate was fixed in advance at CKA ≥ 0.80, and it is not met: the adapter predicts ESM3&#39;s coordinates well while only partly reproducing its geometry. No distilled checkpoint has been published, because calling this an ESM3 replacement would overstate it.</p>
+        
+        <p class="refs"><a class="chip ext" href="https://github.com/rustambekurokov/esm3-distill">code<span class="vh"> (external link)</span></a></p>
+        
+      </div>
+    </li>
+    
+    <li class="entry">
+      <span class="num">03</span>
+      <div>
+        <h3 class="entry-title">BGC-SetNet</h3>
+        <p class="summary">A Set Transformer over frozen ESM-2 embeddings for retrieving related biosynthetic gene clusters, evaluated under group-disjoint splits fixed before training. Plain Pfam-domain Jaccard beat it, 0.879 against 0.847 Recall@50, and that is the result I published.</p>
+        
+        <p class="refs"><a class="chip ext" href="https://doi.org/10.64898/2026.08.21.746127">paper<span class="vh"> (external link)</span></a><a class="chip ext" href="https://github.com/rustambekurokov/bgc_setnet">code<span class="vh"> (external link)</span></a><a class="chip ext" href="https://huggingface.co/rustambekurokov/bgc-setnet">model<span class="vh"> (external link)</span></a><a class="chip ext" href="https://medium.com/@urokovrustambek/we-tried-to-beat-pfam-for-bgc-retrieval-but-pfam-won-80382690799b">write-up<span class="vh"> (external link)</span></a></p>
+        
+      </div>
+    </li>
+    
+    <li class="entry">
+      <span class="num">04</span>
+      <div>
+        <h3 class="entry-title">ESM-2 for protein subcellular localization</h3>
+        <p class="summary">Four strategies compared under one harness on DeepLoc 2.0, 24,667 proteins across 10 classes: a linear probe on the 8M model (69.6% accuracy, MCC 0.614), full fine-tunes of 35M (74.3%) and 150M (76.6%, MCC 0.706), and rank-16 LoRA on 650M (76.5%, MCC 0.704) training 2.4% of the parameters. Four checkpoints and an interactive demo are public.</p>
+        
+        <p class="refs"><a class="chip ext" href="https://github.com/rustambekurokov/esm2-reimplementation">code<span class="vh"> (external link)</span></a><a class="chip ext" href="https://huggingface.co/rustambekurokov">models<span class="vh"> (external link)</span></a><a class="chip ext" href="https://huggingface.co/spaces/rustambekurokov/esm2-protein-localization">demo<span class="vh"> (external link)</span></a><a class="chip ext" href="https://medium.com/@urokovrustambek/fine-tuning-esm-2-for-protein-subcellular-localization-lora-matches-full-fine-tuning-with-2-4-ef3f5a4b6a18">write-up<span class="vh"> (external link)</span></a></p>
+        
+      </div>
+    </li>
+    
+    <li class="entry">
+      <span class="num">05</span>
+      <div>
+        <h3 class="entry-title">Uzbek speech recognition</h3>
+        <p class="summary">Whisper-medium fine-tuned on the 52-hour FeruzaSpeech corpus to 9.64% word error rate and 1.60% character error rate, with a reproducible pipeline for normalisation, Cyrillic-to-Latin handling and augmentation.</p>
+        
+        <p class="refs"><a class="chip ext" href="https://github.com/rustambekurokov/whisper-uzbek-fine-tuned">code<span class="vh"> (external link)</span></a><a class="chip ext" href="https://huggingface.co/rustambekurokov/whisper-small-uzbek">model<span class="vh"> (external link)</span></a></p>
+        
+      </div>
+    </li>
+    
+  </ol>
+</section>
+
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="page">
+    <p>Rustambek Urokov</p>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>We tried to beat Pfam for BGC retrieval. Pfam won. — Rustambek Urokov</title>
+<meta name="description" content="A Set Transformer over frozen ESM-2 embeddings lost to plain Pfam-domain Jaccard on biosynthetic gene cluster retrieval. What a negative result says about baselines and evaluation.">
+<link rel="canonical" href="https://rustambek.org/blog/pfam-won">
+<link rel="alternate" type="application/rss+xml" title="Rustambek Urokov" href="/rss.xml">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Rustambek Urokov">
+<meta property="og:title" content="We tried to beat Pfam for BGC retrieval. Pfam won. — Rustambek Urokov">
+<meta property="og:description" content="A Set Transformer over frozen ESM-2 embeddings lost to plain Pfam-domain Jaccard on biosynthetic gene cluster retrieval. What a negative result says about baselines and evaluation.">
+<meta property="og:url" content="https://rustambek.org/blog/pfam-won">
+<meta property="og:locale" content="en_US">
+
+<meta property="og:image" content="https://rustambek.org/uploads/1d72f342-a28c-4447-9841-f3e187ed0b8f.jpg">
+
+<meta property="og:image:alt" content="Rustambek Urokov">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preload" href="/static/fonts/instrumentserif-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/ibmplexsans-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/fonts.css">
+<link rel="stylesheet" href="/static/prose.css">
+<link rel="stylesheet" href="/static/site.css">
+<script src="/static/app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<details class="nav-menu" id="nav-menu">
+  <summary><span class="vh">Menu</span></summary>
+  <div class="nav-panel">
+    <p class="nav-panel-name">Rustambek Urokov</p>
+    <nav aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="/papers">Papers</a>
+      <a href="/projects">Projects</a>
+      <a href="/blog" aria-current="page">Writing</a>
+    </nav>
+  </div>
+</details>
+
+<header class="site-header">
+  <div class="page page-reading">
+    <div class="masthead">
+      <a class="wordmark" href="/">Rustambek Urokov</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/papers">Papers</a>
+        <a href="/projects">Projects</a>
+        <a href="/blog" aria-current="page">Writing</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+  <div class="page page-reading">
+
+<article class="row">
+  <div class="txt">
+    <div class="article-head">
+      <p class="date">5 Sep 2026 &nbsp;·&nbsp; Rustambek Urokov</p>
+      <h1 class="post-title">We tried to beat Pfam for BGC retrieval. Pfam won.</h1>
+    </div>
+    <div class="prose"><p><em>The full article is on <a href="https://medium.com/@urokovrustambek/we-tried-to-beat-pfam-for-bgc-retrieval-but-pfam-won-80382690799b" rel="noopener noreferrer">Medium</a>. This is the short version.</em></p>
+<p>Protein language models encode things a hand-designed feature list does not, so it seemed
+reasonable to ask whether they could improve retrieval of related biosynthetic gene clusters.
+Given a few known BGCs from a reference group, can we rank the remaining candidates and find
+the related ones?</p>
+<p>I built the pipeline end to end: <em>Streptomyces griseus</em> genomes from NCBI, Prodigal ORF calling,
+DeepBGC cluster detection, BLASTp against MIBiG for silver labels, and genome deduplication.
+That gives an atlas of 6,953 BGCs from 182 deduplicated genome accessions, of which 5,325 carry
+a silver assignment to a MIBiG reference group. The learned model — Pfam-augmented BGC-SetNet —
+aggregates frozen 1,280-dimensional ESM-2 gene embeddings with a Set Transformer and also sees a
+BGC-level inventory of Pfam domains. It was compared against raw mean-pooled ESM-2, plain Pfam
+Jaccard, an ensemble of the two learned scores, and a differentiable weighted-Pfam Jaccard.</p>
+<h2>The evaluation came first</h2>
+<p>Reference groups were split into training, validation and test <em>before</em> any training, pair
+construction or query generation. Checkpoints, model choice and ensemble weights were all
+selected on validation alone. Five optimisation seeds, and inference paired at the level of the
+biological reference group rather than the individual query, because the group is the unit that
+is actually independent.</p>
+<h2>What happened</h2>
+<ul>
+<li>Plain Pfam Jaccard: <strong>Recall@50 0.8788</strong></li>
+<li>Pfam-augmented BGC-SetNet: 0.8472</li>
+<li>Raw ESM + BGC-SetNet ensemble: 0.8769, with no statistically supported improvement over the baseline</li>
+<li>Learned weighted-Pfam Jaccard: 0.8789</li>
+</ul>
+<p>That last number is higher than the baseline by 0.0001. I treat the two as numerically
+indistinguishable rather than as a win.</p>
+<p>Only 16 held-out groups had more than the four references the retrieval protocol needs, so the
+effective evaluation set is small, and the labels are silver rather than curated pathway-level
+ground truth. Both limitations are stated in the paper instead of being replaced with a more
+favourable subgroup.</p>
+<h2>What it means</h2>
+<p>Domain identity already explains most of the signal this benchmark measures. That does not make
+sequence representations useless for BGC work — it means this particular task leaves them nothing
+to add. Sequence-derived features have a real opportunity where domain annotations are incomplete,
+where divergent enzymes keep a function without keeping obvious domain similarity, or where the
+endpoint is chemistry rather than recovering proxy groups that were built out of known reference
+information in the first place. Those experiments need labels that can carry the claim.</p>
+<p>Preprint: <a href="https://doi.org/10.64898/2026.08.21.746127" rel="noopener noreferrer">doi.org/10.64898/2026.08.21.746127</a></p>
+</div>
+  </div>
+</article>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="page page-reading">
+    <p>Rustambek Urokov</p>
+  </div>
+</footer>
+</body>
+</html>

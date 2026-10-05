@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What are diffusion models, and how exactly do they stand out from Autoregressive Models? — Rustambek Urokov</title>
+<meta name="description" content="Autoregressive models generate left to right and pay for it in both accuracy and cost. What diffusion models do instead, and where each one actually wins.">
+<link rel="canonical" href="https://rustambek.org/blog/what-are-diffusion-models-and-how-exactly-do-they-stand-out-from-autoregressive">
+<link rel="alternate" type="application/rss+xml" title="Rustambek Urokov" href="/rss.xml">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Rustambek Urokov">
+<meta property="og:title" content="What are diffusion models, and how exactly do they stand out from Autoregressive Models? — Rustambek Urokov">
+<meta property="og:description" content="Autoregressive models generate left to right and pay for it in both accuracy and cost. What diffusion models do instead, and where each one actually wins.">
+<meta property="og:url" content="https://rustambek.org/blog/what-are-diffusion-models-and-how-exactly-do-they-stand-out-from-autoregressive">
+<meta property="og:locale" content="en_US">
+
+<meta property="og:image" content="https://rustambek.org/uploads/1d72f342-a28c-4447-9841-f3e187ed0b8f.jpg">
+
+<meta property="og:image:alt" content="Rustambek Urokov">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preload" href="/static/fonts/instrumentserif-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/ibmplexsans-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/fonts.css">
+<link rel="stylesheet" href="/static/prose.css">
+<link rel="stylesheet" href="/static/site.css">
+<script src="/static/app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<details class="nav-menu" id="nav-menu">
+  <summary><span class="vh">Menu</span></summary>
+  <div class="nav-panel">
+    <p class="nav-panel-name">Rustambek Urokov</p>
+    <nav aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="/papers">Papers</a>
+      <a href="/projects">Projects</a>
+      <a href="/blog" aria-current="page">Writing</a>
+    </nav>
+  </div>
+</details>
+
+<header class="site-header">
+  <div class="page page-reading">
+    <div class="masthead">
+      <a class="wordmark" href="/">Rustambek Urokov</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/papers">Papers</a>
+        <a href="/projects">Projects</a>
+        <a href="/blog" aria-current="page">Writing</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+  <div class="page page-reading">
+
+<article class="row">
+  <div class="txt">
+    <div class="article-head">
+      <p class="date">24 Sep 2026 &nbsp;·&nbsp; Rustambek Urokov</p>
+      <h1 class="post-title">What are diffusion models, and how exactly do they stand out from Autoregressive Models?</h1>
+    </div>
+    <div class="prose"><p>Since the popularity of generative models exploded, many started to pursue AR (Autoregressive) models, the brightest example of which are GPT-style Transformer models.</p>
+<p>Fyi, AR models generate tokens from left-to-right. So, in sampling process, model doesn’t see other tokens, only previous ones, like illustrated below.</p>
+<p><img src="https://rustambek.org/uploads/1075d5a0680b416b9fbc22c0e09b9fa8.png" alt="Four steps of left-to-right generation, one token added each step: The, cat, sat, on, with an arrow labelled generation order."></p>
+<p>But, AR models have one of the biggest issues that costs accuracy. Ironically, this is what made them best for generative tasks, which is…. Yes, left-to-right bias. The problem is models are not perfect: next token generations depend on estimating a probability distribution over possible upcoming tokens and sampling one from that distribution. And models sometimes mess up; the token showing the highest probability may not be the correct one.</p>
+<p>This can be seen with a simple example. Imagine the model has to generate this sentence: “The dog barked at the stranger”. The model first generates the word “The”. Since it doesn’t have context about the entire sentence, it should rely purely on the word “The” to make the next guess. In other words, it doesn’t see the words “barked at the stranger”. If the probability for “cat” is higher than “dog”, the model may be more likely to sample “cat”. Then, since cats meow instead of barking, it will naturally choose the word “meow”, which is nowhere as close to the expected output.</p>
+<p><img src="https://rustambek.org/uploads/c3227b4881dc4e6c9d27e71fc011b8e9.png" alt="The same left-to-right generation going wrong: cat is sampled instead of dog at step two, and the sentence continues The cat meowed at the stranger."></p>
+<p>On top of that, Transformers are expensive, because they need to perform forward passes for every single predicted token. If we are dealing with images, instead of text, then the cost is going to be astronomical.</p>
+<p>This leads us to another type of models — NARs (Non-autoregressive models); the models that can process the entire text or images simultaneously, unlike AR ones, at much cheaper costs.</p>
+<p>The NAR model we are about to discuss is Diffusion Models. They work completely differently than AR models. Instead of predicting the token step-by-step, it repeatedly updates the whole sample at each denoising step. This is like comparing CPU and a GPU: the first one completes tasks sequentially, while the latter is used for parallelization. Diffusion models are much cheaper than expensive autoregressive models that make an entire forward pass just to predict the next token, word, or image pixel. This is why they are an industry standard right now.</p>
+<p>Suppose you want to train a Diffusion model that generates high-quality images. In the training process, the model is given an image (say, of a dog). Then, the model continuously applies noise, matching Gaussian distribution, until the image is nothing but static. Diffusion has to learn how to make the static go back into the original image; in other words, the <strong>denoising process</strong>. To do that, it first needs to learn to predict the applied noise correctly. After each iteration, it compares the predicted noise with the actual noise, and updates its parameters to reduce the prediction error. You may say this contradicts the claim that diffusions are cheaper, because they still use an iterative process, just like transformers do. But, the key difference is that diffusions need an extremely small number of timesteps to denoise, while autoregressive generation is sequential”. Hence, this is a significant achievement in cost optimization.</p>
+<p>You can see a more clearer illustration of the training process below.</p>
+<p><img src="https://rustambek.org/uploads/5d9145fd893341e6ab66f41d1e63b80c.png" alt="Diffusion training: a clean image has noise added at a sampled timestep, a denoising model predicts that noise, and an MSE loss compares the prediction with the noise actually added."></p>
+<p>To conclude, while autoregressive models are amazing for text generation, representation, and similar tasks, diffusions are the absolute leaders in image and video generation.</p>
+<p><strong>PS. All em dashes and semi-columns are written by me.</strong></p>
+</div>
+  </div>
+</article>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="page page-reading">
+    <p>Rustambek Urokov</p>
+  </div>
+</footer>
+</body>
+</html>

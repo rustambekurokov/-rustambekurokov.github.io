@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Rustambek Urokov</title>
+    <link>https://rustambek.org/blog</link>
+    <description>Undergraduate researcher in machine learning and computational biology at New Uzbekistan University. Held-out evaluation for protein and sequence models.</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 24 Sep 2026 20:38:00 +0500</lastBuildDate>
+    <atom:link href="https://rustambek.org/rss.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>What are diffusion models, and how exactly do they stand out from Autoregressive Models?</title>
+      <link>https://rustambek.org/blog/what-are-diffusion-models-and-how-exactly-do-they-stand-out-from-autoregressive</link>
+      <guid isPermaLink="true">https://rustambek.org/blog/what-are-diffusion-models-and-how-exactly-do-they-stand-out-from-autoregressive</guid>
+      <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Rustambek Urokov</dc:creator>
+      <pubDate>Thu, 24 Sep 2026 20:38:00 +0500</pubDate>
+      <description>Autoregressive models generate left to right and pay for it in both accuracy and cost. What diffusion models do instead, and where each one actually wins.</description>
+    </item>
+    <item>
+      <title>We tried to beat Pfam for BGC retrieval. Pfam won.</title>
+      <link>https://rustambek.org/blog/pfam-won</link>
+      <guid isPermaLink="true">https://rustambek.org/blog/pfam-won</guid>
+      <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Rustambek Urokov</dc:creator>
+      <pubDate>Sat, 05 Sep 2026 11:17:10 +0500</pubDate>
+      <description>A Set Transformer over frozen ESM-2 embeddings lost to plain Pfam-domain Jaccard on biosynthetic gene cluster retrieval. What a negative result says about baselines and evaluation.</description>
+    </item>
+    <item>
+      <title>Fine-tuning ESM-2 for protein subcellular localization: LoRA matches full fine-tuning with 2.4% of the parameters</title>
+      <link>https://rustambek.org/blog/lora-matches-full-fine-tuning</link>
+      <guid isPermaLink="true">https://rustambek.org/blog/lora-matches-full-fine-tuning</guid>
+      <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Rustambek Urokov</dc:creator>
+      <pubDate>Wed, 08 Jul 2026 15:36:09 +0500</pubDate>
+      <description>Rank-16 LoRA on ESM-2 650M reaches the accuracy of a fully fine-tuned 150M model while training 2.4% of the weights — and a frozen 8M linear probe is already most of the way there.</description>
+    </item>
+  </channel>
+</rss>
